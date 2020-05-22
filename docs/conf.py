@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'scholarlyORG'
+project = 'scholarly'
 copyright = '2020, Steven A. Cholewiak, Panos Ipeirotis, Victor Silva'
 author = 'Steven A. Cholewiak, Panos Ipeirotis, Victor Silva'
 
