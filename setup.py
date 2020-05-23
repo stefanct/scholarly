@@ -12,8 +12,11 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license='Unlicense',
+    project_urls={
+        "Documentation":"https://scholarly.readthedocs.io/en/stable/",
+        'Source':"https://github.com/scholarly-python-package/scholarly/",
 
-    url = 'https://github.com/OrganicIrradiation/scholarly',
+    },
     packages=setuptools.find_packages(),
     download_url = 'https://github.com/OrganicIrradiation/scholarly/zip/v0.3',
     keywords = ['Google Scholar', 'academics', 'citations'],
