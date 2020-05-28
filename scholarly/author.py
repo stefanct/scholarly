@@ -14,7 +14,7 @@ _CITATIONAUTH = '/citations?hl=en&user={0}'
 class Author:
     """Returns an object for a single author"""
 
-    def __init__(self, nav, __data):
+    def __init__(self, nav, authorid, __data):
         self.__nav = nav
         self._filled = set()
         self._sections = {'basics',
@@ -75,16 +75,16 @@ class Author:
             self.i10index = int(index[4].text)
             self.i10index5y = int(index[5].text)
         else:
+            self.citedby = 0
+            self.citedby5y = 0
             self.hindex = 0
             self.hindex5y = 0
             self.i10index = 0
             self.i10index5y = 0
 
     def _fill_counts(self, soup):
-        years = [int(y.text)
-                 for y in soup.find_all('span', class_='gsc_g_t')]
-        cites = [int(c.text)
-                 for c in soup.find_all('span', class_='gsc_g_al')]
+        years = [int(y.text) for y in soup.find_all('span', class_='gsc_g_t')]
+        cites = [int(c.text) for c in soup.find_all('span', class_='gsc_g_al')]
         self.cites_per_year = dict(zip(years, cites))
 
     def _fill_publications(self, soup):
@@ -98,20 +98,26 @@ class Author:
                 self.publications.append(new_pub)
             if 'disabled' not in soup.find('button', id='gsc_bpf_more').attrs:
                 pubstart += _PAGESIZE
-                url = '{0}&cstart={1}&pagesize={2}'.format(
-                    url_citations, pubstart, _PAGESIZE)
+                templ = '{0}&cstart={1}&pagesize={2}'
+                url = templ.format(url_citations, pubstart, _PAGESIZE)
                 soup = self.__nav._get_soup(url)
             else:
                 break
 
     def _fill_coauthors(self, soup):
         self.coauthors = []
-        for row in soup.find_all('span', class_='gsc_rsb_a_desc'):
-            new_coauthor = Author(self.__nav, re.findall(
-                _CITATIONAUTHRE, row('a')[0]['href'])[0])
+        for row in soup.find_all('div', class_='gsc_rsb_aa'):
+            author_url = row.find('a')['href']
+            author_id = re.search(r'/citations?user=(.*?)\&', author_url).group(1)
+            new_coauthor = Author(self.__nav, author_id)
+
+            coauthor_img = row.find('img', class_='gs_pp_df')['src']
+            # coauthor_img = coauthor_img.replace("small_photo", "medium_photo")
+            # new_coauthor.url_picture = coauthor_img
+            
             new_coauthor.name = row.find(tabindex="-1").text
-            new_coauthor.affiliation = row.find(
-                class_="gsc_rsb_a_ext").text
+            new_coauthor.affiliation = row.find(class_="gsc_rsb_a_ext").text
+            
             self.coauthors.append(new_coauthor)
 
     def fill(self, sections: list = []):

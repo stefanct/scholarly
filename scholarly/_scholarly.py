@@ -1,4 +1,3 @@
-"""scholarly.py"""
 import requests
 from ._navigator import Navigator
 
